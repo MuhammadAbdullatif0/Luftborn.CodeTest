@@ -1,0 +1,108 @@
+<div class="page">
+  <div class="page__header">
+    <h1 class="page__title">Products</h1>
+    <div class="page__actions">
+      <select class="select" [ngModel]="categoryFilter" (ngModelChange)="setCategoryFilter($event)">
+        <option value="">All Categories</option>
+        @for (cat of categories(); track cat.id) {
+          <option [value]="cat.id">{{ cat.name }}</option>
+        }
+      </select>
+      <button type="button" class="btn btn--primary" (click)="openCreate()">
+        <span class="btn__icon">+</span>
+        Add Product
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert--error">
+      {{ error() }}
+      <button type="button" class="alert__dismiss" (click)="error.set(null)">×</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading">
+      <div class="loading__spinner"></div>
+      <p>Loading...</p>
+    </div>
+  } @else if (products().length === 0) {
+    <div class="empty">
+      <span class="empty__icon">📦</span>
+      <h2>No products yet</h2>
+      <p>Create your first product or try a different category filter</p>
+      <button type="button" class="btn btn--primary" (click)="openCreate()">Add Product</button>
+    </div>
+  } @else {
+    <div class="grid">
+      @for (p of products(); track p.id) {
+        <div class="card">
+          <div class="card__image" [style.backgroundImage]="'url(' + (p.pictureUrl || '/images/placeholder.png') + ')'"></div>
+          <div class="card__body">
+            <span class="card__badge">{{ p.categoryName || getCategoryName(p.productCategoryId) }}</span>
+            <h3 class="card__title">{{ p.name }}</h3>
+            <p class="card__desc">{{ p.description }}</p>
+            <p class="card__price">{{ p.price | number:'1.2-2' }} <small>EGP</small></p>
+          </div>
+          <div class="card__actions">
+            <button type="button" class="btn btn--ghost" (click)="openEdit(p)">Edit</button>
+            @if (deleteConfirmId() === p.id) {
+              <div class="confirm">
+                <span>Delete?</span>
+                <button type="button" class="btn btn--danger btn--sm" (click)="delete(p.id)">Yes</button>
+                <button type="button" class="btn btn--ghost btn--sm" (click)="cancelDelete()">No</button>
+              </div>
+            } @else {
+              <button type="button" class="btn btn--ghost btn--danger" (click)="confirmDelete(p.id)">Delete</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (modalOpen()) {
+  <div class="modal-backdrop" (click)="closeModal()"></div>
+  <div class="modal modal--wide" role="dialog" (click)="$event.stopPropagation()">
+    <div class="modal__header">
+      <h2>{{ editingId() ? 'Edit Product' : 'New Product' }}</h2>
+      <button type="button" class="modal__close" (click)="closeModal()" aria-label="Close">×</button>
+    </div>
+    <div class="modal__body">
+      <div class="form-grid">
+        <div class="field">
+          <label for="p-name">Name</label>
+          <input id="p-name" type="text" [(ngModel)]="form.name" placeholder="Product name" class="input" />
+        </div>
+        <div class="field">
+          <label for="p-category">Category</label>
+          <select id="p-category" class="input" [(ngModel)]="form.productCategoryId">
+            @for (cat of categories(); track cat.id) {
+              <option [value]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="field field--full">
+          <label for="p-desc">Description</label>
+          <textarea id="p-desc" [(ngModel)]="form.description" placeholder="Product description" class="input" rows="3"></textarea>
+        </div>
+        <div class="field">
+          <label for="p-price">Price</label>
+          <input id="p-price" type="number" [(ngModel)]="form.price" placeholder="0" class="input" min="0" step="0.01" />
+        </div>
+        <div class="field field--full">
+          <label for="p-image">Image URL</label>
+          <input id="p-image" type="text" [(ngModel)]="form.pictureUrl" placeholder="https://..." class="input" />
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button type="button" class="btn btn--ghost" (click)="closeModal()">Cancel</button>
+      <button type="button" class="btn btn--primary" (click)="save()" [disabled]="formSaving() || !form.name.trim()">
+        {{ formSaving() ? 'Saving...' : 'Save' }}
+      </button>
+    </div>
+  </div>
+}

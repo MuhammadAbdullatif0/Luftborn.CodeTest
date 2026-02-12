@@ -1,0 +1,32 @@
+<header class="header">
+  <div class="header__container">
+    <a routerLink="/" class="header__brand">
+      <span class="header__logo">◆</span>
+      <span class="header__title">Luftborn Store</span>
+    </a>
+
+    <nav class="header__nav">
+      <a routerLink="/" routerLinkActive="header__link--active" [routerLinkActiveOptions]="{ exact: true }" class="header__link">
+        Home
+      </a>
+      <a routerLink="/products" routerLinkActive="header__link--active" class="header__link">
+        Products
+      </a>
+      <a routerLink="/categories" routerLinkActive="header__link--active" class="header__link">
+        Categories
+      </a>
+    </nav>
+
+    <button type="button" class="header__toggle" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen()" aria-label="Toggle menu">
+      <span class="header__hamburger" [class.header__hamburger--open]="menuOpen()"></span>
+      <span class="header__hamburger" [class.header__hamburger--open]="menuOpen()"></span>
+      <span class="header__hamburger" [class.header__hamburger--open]="menuOpen()"></span>
+    </button>
+  </div>
+
+  <div class="header__mobile" [class.header__mobile--open]="menuOpen()">
+    <a routerLink="/" (click)="closeMenu()" class="header__mobile-link">Home</a>
+    <a routerLink="/products" (click)="closeMenu()" class="header__mobile-link">Products</a>
+    <a routerLink="/categories" (click)="closeMenu()" class="header__mobile-link">Categories</a>
+  </div>
+</header>
